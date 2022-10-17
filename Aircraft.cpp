@@ -19,11 +19,18 @@ void Aircraft::setAltitude( float altitude ) {
 }
 
 void Aircraft::startEngine() {
-	//heightmap_path = "Resources/8k_map/Heightmap.png";
-	heightmap_path = "Resources/test.png";
+	heightmap_path = "Resources/8k_map/Heightmap.png";
 	hmap = new HeightMap( heightmap_path, false, -16, 250, 800, 15.f, 10.f, 10.f );
-	//hmap->SetUAVPos( 912, 2451 );
-	//hmap->getHeight( 958, 2743 );
+	hmap->SetUAVPos( 912, 2451 );
+	float heights[3] = {
+		hmap->getHeight( 958, 2743 ),
+		hmap->getHeight( 912, 2451 ),
+		hmap->getHeight( 1000, 3000 ),
+	};
 	hmap->showMap();
+	std::cout << "\n\n=========================\n";
+	std::cout << "Height on (958, 2743) is: " << heights[0] << " meters" << std::endl;
+	std::cout << "Height on (912, 2451) is: " << heights[1] << " meters" << std::endl;
+	std::cout << "Height on (1000, 3000) is: " << heights[2] << " meters" << std::endl;
 	delete hmap;
 }
