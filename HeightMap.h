@@ -8,12 +8,21 @@
 class HeightMap
 {
 	int piece_size;
-	float zero_lattitude; // zero x pixel
-	float zero_longitude; // zero y pixel
-	float height_step;
-	float pixel_x_step, pixel_y_step;
+	float zero_latitude;	// corresponds to zero x pixel
+	float zero_longitude;	// corresponds to zero y pixel
+	float height_step;		// meters per pixel brightness
+	float pixel_x_step, pixel_y_step;	// how many latitude and longitude per one pixel
+
+	int piece_index_i, piece_index_j;
+
+	std::string filename;
+	cv::Mat current_map;
 public:
-	HeightMap( std::string filename );
+	HeightMap(
+		std::string filename, bool is_new_map=true,
+		float zero_latitude=0.f, float zero_longitude=0.f,
+		int piece_size=800, float height_step=34.7f,
+		float pixel_x_step=15.f, float pixel_y_step=15.f);
 	// filename is PNG or JPEG file
 	// load this file via opencv
 	// cut the file on pieces and save them
@@ -24,8 +33,15 @@ public:
 	// load a correspondance map piece in thread
 
 	float getHeight( float latitude, float longitude );
-	// convert lattitude and longitude to pixel coordinate
+	// convert latitude and longitude to pixel coordinate
 	// check if pixel coordinates are within loaded piece and return height
 	// if no return nan but this case is unusual and rare. our aim is to neglect one
+
+	void showMap();
+
+	void getImageDepth();
+
+private:
+	void cropImage(int cols_num, int cols_res, int rows_num, int rows_res);
 };
 
