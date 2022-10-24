@@ -1,5 +1,6 @@
 #pragma once
 #include "HeightMap.h"
+#include <chrono>
 
 class Aircraft
 {
@@ -7,8 +8,18 @@ class Aircraft
 
 	float latitude, longitude;
 	float x_velocity, y_velocity;
-	float altitude;		// height above sea level
-	float distance_to_ground;
+	float altitude;				// height above sea level meters
+	float distance_to_surface = NULL;
+	float surface_height = NULL;
+
+	float delay_ms = 20;				// delay in milliseconds
+	const float one_sec_delay = 1000;	// in milliseconds
+
+	struct ControlPanel {	// in decimeters
+		int x_velocity;
+		int y_velocity;
+		int altitude;
+	} control_panel;
 	
 	std::string heightmap_path;
 	HeightMap* hmap;
@@ -22,6 +33,12 @@ public:
 
 	void setAltitude( float altitude );
 
-	void startEngine();
+	void startEngine();	// gui works
+
+	void fly();
+
+	void getInfo();
+
+	//uint64_t current_timestamp();
 };
 

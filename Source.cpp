@@ -1,5 +1,7 @@
 #include "Aircraft.h"
+#include <thread>
 
+void f();
 
 int main() {
 	//std::string path = "Resources/Heightmap.png";
@@ -27,8 +29,22 @@ int main() {
 	HeightMap map( test_path, false);
 	map.showMap();*/
 
-	Aircraft aircraft("Il-86");
-	aircraft.startEngine();
+
+	Aircraft aircraft( "Il-86" );
+	/*aircraft.startEngine();
+	aircraft.fly();
+	aircraft.getInfo();*/
+	//std::thread gui_thr( &Aircraft::startEngine, aircraft);	//gui thread
+	//std::thread fly_thr( &Aircraft::fly, aircraft);			//fly thread
+	//std::thread info_thr( &Aircraft::getInfo, aircraft);	//info thread
+
+	std::thread gui_thr( [&]() {aircraft.startEngine(); } );	//gui thread
+	std::thread fly_thr( [&]() {aircraft.fly(); } );			//fly thread
+	std::thread info_thr( [&]() {aircraft.getInfo(); } );	//info thread
+
+	gui_thr.join();
+	fly_thr.join();
+	info_thr.join();
 
 	return 0;
 }

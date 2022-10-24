@@ -39,24 +39,29 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 }
 
 void HeightMap::SetUAVPos( float latitude, float longitude ) {
+	mtx.lock();
+
 	// loading corresponding map piece
 	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step);
-	int pixel_y = round( (longitude - zero_longitude) / pixel_y_step );
+	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
 
 	piece_index_i = pixel_x / piece_size;
 	piece_index_j = pixel_y / piece_size;
-	std::string piece_filename =
+	piece_filename =
 		filename.substr( 0, filename.find_last_of( "." ) )			// Original filename without extension
 		+ "_" + std::to_string(piece_index_i) + "_" + std::to_string(piece_index_j) +		// indexes of pieces
 		filename.substr( filename.find_last_of( "." ) );			// extension of original file
+	
 	current_map = cv::imread( piece_filename );
+	
+	mtx.unlock();
 }
 
 float HeightMap::getHeight( float latitude, float longitude ) {
 	if (!current_map.empty()) {
 		// converting to global pixel coordinates
 		int pixel_x = round( (latitude - zero_latitude) / pixel_x_step );
-		int pixel_y = round( (longitude - zero_longitude) / pixel_y_step );
+		int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
 
 		// calculating piece indexes
 		int i = pixel_x / piece_size;
@@ -113,13 +118,23 @@ void HeightMap::cropImage( int cols_num, int cols_res, int rows_num, int rows_re
 	}
 }
 
-void HeightMap::showMap()
+void HeightMap::showMap(float latitude, float longitude )
 {
+	// converting to global pixel coordinates
+	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step );
+	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
+
+	// converting global pixel coordinates to local
+	pixel_x %= piece_size;
+	pixel_y %= piece_size;
+
+	std::string window_name = "Current Map";
 	if (!current_map.empty()) {
-		cv::imshow( "Current Map", current_map );
-		cv::moveWindow( "Current Map", 100, 100 );
-		cv::waitKey( 0 );
+		cv::circle( current_map, cv::Point( pixel_x, pixel_y ), 10, cv::Scalar( 0, 0, 255 ), cv::FILLED );
+		cv::imshow( window_name, current_map );
+		cv::waitKey( 1000 );
 	}
+	else return;
 }
 
 void HeightMap::getImageDepth() {
