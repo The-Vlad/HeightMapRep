@@ -12,10 +12,9 @@ class Aircraft
 	float distance_to_surface = NULL;
 	float surface_height = NULL;
 
-	float delay_ms = 20;				// delay in milliseconds
-	const float one_sec_delay = 1000;	// in milliseconds
+	int delay_ms = 10;				// delay in milliseconds
 
-	struct ControlPanel {	// in decimeters
+	struct ControlPanel {
 		int x_velocity;
 		int y_velocity;
 		int altitude;
@@ -23,6 +22,7 @@ class Aircraft
 	
 	std::string heightmap_path;
 	HeightMap* hmap;
+	std::mutex aircraft_mtx;
 public:
 	Aircraft(std::string name, float latitude=0.f, float longitude=0.f, float altitude=1000.f,
 		float x_velocity=0.f, float y_velocity=0.f);

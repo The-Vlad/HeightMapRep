@@ -4,6 +4,7 @@
 void f();
 
 int main() {
+	std::setlocale( LC_ALL, "rus" );
 	//std::string path = "Resources/Heightmap.png";
 	//cv::Rect rect( 0, 0, 512, 512 );
 	//cv::Mat* img = new cv::Mat(cv::imread( path ));

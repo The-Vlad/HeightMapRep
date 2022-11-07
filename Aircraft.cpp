@@ -2,15 +2,50 @@
 
 Aircraft::Aircraft( std::string name, float latitude, float longitude, float altitude,
 	float x_velocity, float y_velocity )
-	: name(name),
-	latitude(latitude),
-	longitude(longitude),
-	altitude(altitude),
-	x_velocity(x_velocity),
-	y_velocity(y_velocity) 
+	: name( name ),
+	latitude( latitude ),
+	longitude( longitude ),
+	altitude( altitude ),
+	x_velocity( x_velocity ),
+	y_velocity( y_velocity )
 {
-	heightmap_path = "Resources/8k_map/Heightmap.png";
-	hmap = new HeightMap( heightmap_path, false, -40645, 40645 );
+	char answer;
+	while (true) {
+		std::cout << "Загрузить файл \"Resources/8k_map/Heightmap.png\"? (y/n): ";
+		std::cin >> answer;
+		if (answer == 'y') {
+			heightmap_path = "Resources/8k_map/Heightmap.png";
+			break;
+		}
+		else if (answer == 'n') {
+			std::cout << "Введите путь до файла: ";
+			std::cin.ignore( std::numeric_limits<std::streamsize>::max(), '\n' );
+			std::getline( std::cin, heightmap_path );
+			break;
+		}
+		else {
+			std::cout << "Ошибка ввода.\n";
+		}
+	}
+
+	bool is_new;
+	while (true) {
+		std::cout << "Разбить изображение на фрагменты если это не сделано? (y/n): ";
+		std::cin >> answer;
+		if (answer == 'y') {
+			is_new = true;
+			break;
+		}
+		else if (answer == 'n') {
+			is_new = false;
+			break;
+		}
+		else {
+			std::cout << "Ошибка ввода.\n";
+		}
+	}
+	
+	hmap = new HeightMap( heightmap_path, is_new, -40645, 40645 );
 	hmap->SetUAVPos( latitude, longitude );
 
 	control_panel.altitude = altitude;
@@ -55,21 +90,32 @@ void Aircraft::startEngine() {
 		cv::putText( bg, "Altitude: " + std::to_string( altitude ) + " meters", cv::Point( 10, 110 ), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar( 0, 0, 0 ) );
 		cv::putText( bg, "Height map: " + std::to_string( surface_height ) + " meters", cv::Point( 10, 140 ), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar( 0, 0, 0 ) );
 		cv::putText( bg, "Distance to surface: " + std::to_string( distance_to_surface ) + " meters", cv::Point( 10, 170 ), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar( 0, 0, 0 ) );
+		cv::putText( bg, "Piece file name: " + hmap->getPieceName(), cv::Point( 10, 200 ), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar( 0, 0, 0 ) );
 		cv::imshow( "Trackbars", bg );
 	}
 }
 
-void Aircraft::fly() {
+void Aircraft::fly() {		
+	auto t1 = std::chrono::steady_clock::now();
+	auto t2 = std::chrono::steady_clock::now();
+	std::chrono::duration<float> time_diff;
+		
 	while(true) {
-		std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+		std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
 
+		//aircraft_mtx.lock();
 		altitude = (float) control_panel.altitude;
 		x_velocity = (float) control_panel.x_velocity;
 		y_velocity = (float) control_panel.y_velocity;
 
-		latitude += x_velocity * 1.000;
-		longitude += y_velocity * 1.000;
+		t2 = std::chrono::steady_clock::now();
+		time_diff = t2 - t1;
+		latitude += x_velocity * time_diff.count();
+		longitude += y_velocity * time_diff.count();
+		t1 = std::chrono::steady_clock::now();
 		distance_to_surface = altitude - surface_height;
+		//aircraft_mtx.unlock();
+
 		hmap->SetUAVPos( latitude, longitude );
 
 		//std::cout << "\n####################" << std::endl;
@@ -83,8 +129,10 @@ void Aircraft::fly() {
 
 void Aircraft::getInfo() {
 	while (true) {
-		std::this_thread::sleep_for( std::chrono::milliseconds( 15 ) );
+		std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
+		//aircraft_mtx.lock();
 		surface_height = hmap->getHeight( latitude, longitude );
+		//aircraft_mtx.unlock();
 	}
 }
 

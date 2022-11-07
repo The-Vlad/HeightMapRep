@@ -15,50 +15,51 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 	current_map = cv::imread( filename );
 	cv::cvtColor( current_map, current_map, cv::COLOR_BGR2GRAY );
 
-	if (is_new_map) {
+	int piece_x_num = 1, piece_y_num = 1;
+	int piece_x_res = 0, piece_y_res = 0;
+	int cols = current_map.cols, rows = current_map.rows;
+	bool crop = false;
 
-		int piece_x_num = 1, piece_y_num = 1;
-		int piece_x_res = 0, piece_y_res = 0;
-		int cols = current_map.cols, rows = current_map.rows;
-		bool crop = false;
-
-		if (cols > piece_size) {
-			piece_x_num = cols / piece_size;
-			piece_x_res = cols % piece_size;
-			crop = true;
-		}
-
-		if (rows > piece_size) {
-			piece_y_num = cols / piece_size;
-			piece_y_res = cols % piece_size;
-			crop = true;
-		}
-
-		if (crop) cropImage( piece_x_num, piece_x_res, piece_y_num, piece_y_res );
+	if (cols > piece_size) {
+		piece_x_num = cols / piece_size;
+		piece_x_res = cols % piece_size;
+		crop = true;
 	}
+
+	if (rows > piece_size) {
+		piece_y_num = cols / piece_size;
+		piece_y_res = cols % piece_size;
+		crop = true;
+	}
+
+	if (crop && is_new_map) cropImage( piece_x_num, piece_x_res, piece_y_num, piece_y_res );
 }
 
 void HeightMap::SetUAVPos( float latitude, float longitude ) {
-	mtx.lock();
-
 	// loading corresponding map piece
 	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step);
 	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
 
+	mtx.lock();
 	piece_index_i = pixel_x / piece_size;
 	piece_index_j = pixel_y / piece_size;
+	mtx.unlock();
+
 	piece_filename =
 		filename.substr( 0, filename.find_last_of( "." ) )			// Original filename without extension
 		+ "_" + std::to_string(piece_index_i) + "_" + std::to_string(piece_index_j) +		// indexes of pieces
 		filename.substr( filename.find_last_of( "." ) );			// extension of original file
 	
+
+	mtx.lock();
 	current_map = cv::imread( piece_filename );
-	
 	mtx.unlock();
 }
 
 float HeightMap::getHeight( float latitude, float longitude ) {
+	mtx.lock();
 	if (!current_map.empty()) {
+		mtx.unlock();
 		// converting to global pixel coordinates
 		int pixel_x = round( (latitude - zero_latitude) / pixel_x_step );
 		int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
@@ -67,20 +68,26 @@ float HeightMap::getHeight( float latitude, float longitude ) {
 		int i = pixel_x / piece_size;
 		int j = pixel_y / piece_size;
 
+		mtx.lock();
 		// check if global pixel coordinates are within loaded piece
 		if (i == piece_index_i && j == piece_index_j) {
 			// calculating height with local pixel coordinates
 			uchar& pixel = current_map.at<uchar>( pixel_x % piece_size , pixel_y % piece_size );
+			mtx.unlock();
 			return height_step * pixel;
 		}
 		else {
 			SetUAVPos( latitude, longitude );
 			// calculating height
 			uchar& pixel = current_map.at<uchar>( pixel_x % piece_size, pixel_y % piece_size );
+			mtx.unlock();
 			return height_step * pixel;
 		}
 	}
-	else return -1;
+	else {
+		mtx.unlock();
+		return -1;
+	}
 }
 
 void HeightMap::cropImage( int cols_num, int cols_res, int rows_num, int rows_res ) {
@@ -128,13 +135,17 @@ void HeightMap::showMap(float latitude, float longitude )
 	pixel_x %= piece_size;
 	pixel_y %= piece_size;
 
-	std::string window_name = "Current Map";
+	mtx.lock();
 	if (!current_map.empty()) {
 		cv::circle( current_map, cv::Point( pixel_x, pixel_y ), 10, cv::Scalar( 0, 0, 255 ), cv::FILLED );
 		cv::imshow( window_name, current_map );
-		cv::waitKey( 1000 );
+		mtx.unlock();
+		cv::waitKey( 10 );
 	}
-	else return;
+	else {
+		mtx.unlock();
+		return;
+	}
 }
 
 void HeightMap::getImageDepth() {
@@ -158,3 +169,6 @@ void HeightMap::getImageDepth() {
 	}
 }
 
+std::string HeightMap::getPieceName() {
+	return piece_filename;
+}

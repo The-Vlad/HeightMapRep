@@ -17,6 +17,7 @@ class HeightMap
 
 	std::string filename;
 	std::string piece_filename = "";
+	std::string window_name = "Current Map";
 	cv::Mat current_map;
 	std::mutex mtx;
 public:
@@ -42,6 +43,8 @@ public:
 	void showMap(float latitude, float longitude );
 
 	void getImageDepth();
+
+	std::string getPieceName();
 
 private:
 	void cropImage(int cols_num, int cols_res, int rows_num, int rows_res);
