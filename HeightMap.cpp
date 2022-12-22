@@ -36,6 +36,7 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 }
 
 void HeightMap::SetUAVPos( float latitude, float longitude ) {
+	std::cout << "setUAVPos ID: " << std::this_thread::get_id() << std::endl;
 	// loading corresponding map piece
 	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step);
 	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
@@ -43,7 +44,6 @@ void HeightMap::SetUAVPos( float latitude, float longitude ) {
 	mtx.lock();
 	piece_index_i = pixel_x / piece_size;
 	piece_index_j = pixel_y / piece_size;
-	mtx.unlock();
 
 	piece_filename =
 		filename.substr( 0, filename.find_last_of( "." ) )			// Original filename without extension
@@ -51,12 +51,12 @@ void HeightMap::SetUAVPos( float latitude, float longitude ) {
 		filename.substr( filename.find_last_of( "." ) );			// extension of original file
 	
 
-	mtx.lock();
 	current_map = cv::imread( piece_filename );
 	mtx.unlock();
 }
 
 float HeightMap::getHeight( float latitude, float longitude ) {
+	std::cout << "getHeight ID: " << std::this_thread::get_id() << std::endl;
 	mtx.lock();
 	if (!current_map.empty()) {
 		mtx.unlock();
@@ -77,8 +77,10 @@ float HeightMap::getHeight( float latitude, float longitude ) {
 			return height_step * pixel;
 		}
 		else {
+			mtx.unlock();
 			SetUAVPos( latitude, longitude );
 			// calculating height
+			mtx.lock();
 			uchar& pixel = current_map.at<uchar>( pixel_x % piece_size, pixel_y % piece_size );
 			mtx.unlock();
 			return height_step * pixel;
