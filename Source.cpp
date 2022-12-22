@@ -1,7 +1,6 @@
 #include "Aircraft.h"
 #include <thread>
 
-void f();
 
 int main() {
 	std::setlocale( LC_ALL, "rus" );

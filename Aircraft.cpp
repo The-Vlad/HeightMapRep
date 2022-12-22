@@ -101,7 +101,7 @@ void Aircraft::fly() {
 	std::chrono::duration<float> time_diff;
 		
 	while(true) {
-		std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
+		//std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
 
 		//aircraft_mtx.lock();
 		altitude = (float) control_panel.altitude;
@@ -129,7 +129,7 @@ void Aircraft::fly() {
 
 void Aircraft::getInfo() {
 	while (true) {
-		std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
+		//std::this_thread::sleep_for( std::chrono::milliseconds( delay_ms ) );
 		//aircraft_mtx.lock();
 		surface_height = hmap->getHeight( latitude, longitude );
 		//aircraft_mtx.unlock();

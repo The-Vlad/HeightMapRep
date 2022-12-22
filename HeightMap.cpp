@@ -40,10 +40,10 @@ void HeightMap::SetUAVPos( float latitude, float longitude ) {
 	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step);
 	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
 
-	mtx.lock();
+	mtx_setpos.lock();
 	piece_index_i = pixel_x / piece_size;
 	piece_index_j = pixel_y / piece_size;
-	mtx.unlock();
+	mtx_setpos.unlock();
 
 	piece_filename =
 		filename.substr( 0, filename.find_last_of( "." ) )			// Original filename without extension
@@ -51,15 +51,13 @@ void HeightMap::SetUAVPos( float latitude, float longitude ) {
 		filename.substr( filename.find_last_of( "." ) );			// extension of original file
 	
 
-	mtx.lock();
+	mtx_setpos.lock();
 	current_map = cv::imread( piece_filename );
-	mtx.unlock();
+	mtx_setpos.unlock();
 }
 
 float HeightMap::getHeight( float latitude, float longitude ) {
-	mtx.lock();
 	if (!current_map.empty()) {
-		mtx.unlock();
 		// converting to global pixel coordinates
 		int pixel_x = round( (latitude - zero_latitude) / pixel_x_step );
 		int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
@@ -68,24 +66,25 @@ float HeightMap::getHeight( float latitude, float longitude ) {
 		int i = pixel_x / piece_size;
 		int j = pixel_y / piece_size;
 
-		mtx.lock();
+		
 		// check if global pixel coordinates are within loaded piece
 		if (i == piece_index_i && j == piece_index_j) {
+			float result;
+			mtx_getheight.lock();
 			// calculating height with local pixel coordinates
 			uchar& pixel = current_map.at<uchar>( pixel_x % piece_size , pixel_y % piece_size );
-			mtx.unlock();
-			return height_step * pixel;
+			result = height_step * pixel;
+			mtx_getheight.unlock();
+			return result;
 		}
 		else {
 			SetUAVPos( latitude, longitude );
 			// calculating height
 			uchar& pixel = current_map.at<uchar>( pixel_x % piece_size, pixel_y % piece_size );
-			mtx.unlock();
 			return height_step * pixel;
 		}
 	}
 	else {
-		mtx.unlock();
 		return -1;
 	}
 }
@@ -135,15 +134,15 @@ void HeightMap::showMap(float latitude, float longitude )
 	pixel_x %= piece_size;
 	pixel_y %= piece_size;
 
-	mtx.lock();
+	mtx_showmap.lock();
 	if (!current_map.empty()) {
 		cv::circle( current_map, cv::Point( pixel_x, pixel_y ), 10, cv::Scalar( 0, 0, 255 ), cv::FILLED );
 		cv::imshow( window_name, current_map );
-		mtx.unlock();
-		cv::waitKey( 10 );
+		mtx_showmap.unlock();
+		cv::waitKey( 1 );
 	}
 	else {
-		mtx.unlock();
+		mtx_showmap.unlock();
 		return;
 	}
 }
