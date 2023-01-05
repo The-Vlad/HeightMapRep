@@ -36,7 +36,6 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 }
 
 void HeightMap::SetUAVPos( float latitude, float longitude ) {
-	std::cout << "setUAVPos ID: " << std::this_thread::get_id() << std::endl;
 	// loading corresponding map piece
 	int pixel_x = round( (latitude - zero_latitude) / pixel_x_step);
 	int pixel_y = round( (-1) * (longitude - zero_longitude) / pixel_y_step );
@@ -56,7 +55,6 @@ void HeightMap::SetUAVPos( float latitude, float longitude ) {
 }
 
 float HeightMap::getHeight( float latitude, float longitude ) {
-	std::cout << "getHeight ID: " << std::this_thread::get_id() << std::endl;
 	mtx.lock();
 	if (!current_map.empty()) {
 		mtx.unlock();
@@ -142,7 +140,7 @@ void HeightMap::showMap(float latitude, float longitude )
 		cv::circle( current_map, cv::Point( pixel_x, pixel_y ), 10, cv::Scalar( 0, 0, 255 ), cv::FILLED );
 		cv::imshow( window_name, current_map );
 		mtx.unlock();
-		cv::waitKey( 10 );
+		cv::waitKey( 1 );
 	}
 	else {
 		mtx.unlock();

@@ -12,7 +12,7 @@ class Aircraft
 	float distance_to_surface = NULL;
 	float surface_height = NULL;
 
-	int delay_ms = 10;				// delay in milliseconds
+	int delay_ms = 1;				// delay in milliseconds
 
 	struct ControlPanel {
 		int x_velocity;
