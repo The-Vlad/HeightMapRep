@@ -1,10 +1,12 @@
 #pragma once
 #include "HeightMap.h"
-#include <chrono>
+#include <chrono>	// for update time and calculating stats of vehicle
+
 
 class Aircraft
 {
 	std::string name;
+	bool is_gui;
 
 	float latitude, longitude;
 	float x_velocity, y_velocity;
@@ -12,8 +14,11 @@ class Aircraft
 	float distance_to_surface = NULL;
 	float surface_height = NULL;
 
-	int delay_ms = 1;				// delay in milliseconds
+	//int delay_int = 1;				// delay in milliseconds
+	std::chrono::microseconds delay_ms = std::chrono::milliseconds( 1 );
+	std::chrono::steady_clock::duration call_time, interval_time;
 
+	// Панель управления нужна для cv::Trackbar, так как он принимает тип int, а не float
 	struct ControlPanel {
 		int x_velocity;
 		int y_velocity;

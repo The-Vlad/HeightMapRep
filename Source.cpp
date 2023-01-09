@@ -31,7 +31,7 @@ int main() {
 	map.showMap();*/
 
 
-	Aircraft aircraft( "Il-86" );
+	Aircraft aircraft( "Il-86", 0.f, 0.f, 12000);
 	/*aircraft.startEngine();
 	aircraft.fly();
 	aircraft.getInfo();*/

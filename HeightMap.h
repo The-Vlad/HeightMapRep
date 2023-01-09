@@ -47,6 +47,7 @@ public:
 	std::string getPieceName();
 
 private:
-	void cropImage(int cols_num, int cols_res, int rows_num, int rows_res);
+	void old_cropImage(int cols_num, int cols_res, int rows_num, int rows_res);
+	void cropImage( int x_pieces_num, int y_pieces_num, int piece_x_res, int piece_y_res );
 };
 

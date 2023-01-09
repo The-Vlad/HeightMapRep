@@ -15,24 +15,26 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 	current_map = cv::imread( filename );
 	cv::cvtColor( current_map, current_map, cv::COLOR_BGR2GRAY );
 
-	int piece_x_num = 1, piece_y_num = 1;
+	// инициализация количества кусочков по осям и остатков
+	int x_pieces_num = 1, y_pieces_num = 1;
 	int piece_x_res = 0, piece_y_res = 0;
+	// получение количества пикселей по осям
 	int cols = current_map.cols, rows = current_map.rows;
 	bool crop = false;
 
 	if (cols > piece_size) {
-		piece_x_num = cols / piece_size;
+		x_pieces_num = cols / piece_size;
 		piece_x_res = cols % piece_size;
 		crop = true;
 	}
 
 	if (rows > piece_size) {
-		piece_y_num = cols / piece_size;
+		y_pieces_num = cols / piece_size;
 		piece_y_res = cols % piece_size;
 		crop = true;
 	}
 
-	if (crop && is_new_map) cropImage( piece_x_num, piece_x_res, piece_y_num, piece_y_res );
+	if (crop && is_new_map) cropImage( x_pieces_num - 1, y_pieces_num - 1, piece_x_res,  piece_y_res );
 }
 
 void HeightMap::SetUAVPos( float latitude, float longitude ) {
@@ -90,7 +92,77 @@ float HeightMap::getHeight( float latitude, float longitude ) {
 	}
 }
 
-void HeightMap::cropImage( int cols_num, int cols_res, int rows_num, int rows_res ) {
+void HeightMap::cropImage( int x_pieces_num, int y_pieces_num, int piece_x_res, int piece_y_res ) {
+	// Создаём буферные прямоугольники для обрезки изображений
+	cv::Rect rect( 0, 0, piece_size, piece_size );
+	cv::Rect residual_rect_right_corner( x_pieces_num * piece_size, 0, piece_size + piece_x_res, piece_size );
+	cv::Rect residual_rect_bottom_corner( 0, y_pieces_num * piece_size, piece_size, piece_size + piece_y_res );
+	cv::Rect residual_rect_right_bottom_corner( x_pieces_num * piece_size, y_pieces_num * piece_size, piece_size + piece_x_res, piece_size + piece_y_res );
+
+	cv::Mat cropped_map;
+	std::string path_to_save = filename.substr( 0, filename.find_last_of( "." ) );
+	std::string extension = filename.substr( filename.find_last_of( "." ) );
+
+	// crop main segments
+	for (int i = 0; i < x_pieces_num; i++) {
+		for (int j = 0; j < y_pieces_num; j++) {
+			// define top left corner of buffer rectangle
+			rect.x = i * piece_size;
+			rect.y = j * piece_size;
+
+			// crop image
+			cropped_map = current_map( rect );
+
+			// save image to disk:
+			if (!cropped_map.empty()) {
+				cv::imwrite( path_to_save + "_" + std::to_string( i ) + "_" + std::to_string( j ) + extension, cropped_map );
+			}
+		}
+	}
+
+	// crop residual segments
+	// right corner
+	if (piece_x_res) {
+		for (int j = 0; j < y_pieces_num; j++) {
+			// define top corner of buffer rectangle
+			residual_rect_right_corner.y = j * piece_size;
+
+			// crop image
+			cropped_map = current_map( residual_rect_right_corner );
+
+			// save image to disk:
+			if (!cropped_map.empty()) {
+				cv::imwrite( path_to_save + "_" + std::to_string( x_pieces_num ) + "_" + std::to_string( j ) + extension, cropped_map );
+			}
+		}
+	}
+
+	// bottom corner
+	if (piece_y_res) {
+		for (int i = 0; i < x_pieces_num; i++) {
+			// define left corner of buffer rectangle
+			residual_rect_bottom_corner.x = i * piece_size;
+
+			// crop image
+			cropped_map = current_map( residual_rect_bottom_corner );
+
+			// save image to disk:
+			if (!cropped_map.empty()) {
+				cv::imwrite( path_to_save + "_" + std::to_string( i ) + "_" + std::to_string( y_pieces_num ) + extension, cropped_map );
+			}
+		}
+	}
+
+	// right bottom corner
+	if (piece_x_res && piece_y_res) {
+		cropped_map = current_map( residual_rect_right_bottom_corner );
+		if (!cropped_map.empty()) {
+			cv::imwrite( path_to_save + "_" + std::to_string( x_pieces_num ) + "_" + std::to_string( y_pieces_num ) + extension, cropped_map );
+		}
+	}
+}
+
+void HeightMap::old_cropImage( int cols_num, int cols_res, int rows_num, int rows_res ) {
 	cv::Rect rect(0, 0, piece_size, piece_size );
 	cv::Rect residual_x(piece_size * cols_num, 0, cols_res, piece_size * rows_num);
 	cv::Rect residual_y( 0, piece_size * rows_num, current_map.cols, rows_res );
