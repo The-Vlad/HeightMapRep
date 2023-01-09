@@ -11,7 +11,7 @@ Aircraft::Aircraft( std::string name, float latitude, float longitude, float alt
 {
 	char answer;
 	while (true) {
-		std::cout << "Загрузить файл \"Resources/8k_map/Heightmap.png\"? (y/n): ";
+		std::cout << "Укажите путь до файла. Загрузить файл \"Resources/8k_map/Heightmap.png\"? (y/n): ";
 		std::cin >> answer;
 		if (answer == 'y') {
 			heightmap_path = "Resources/8k_map/Heightmap.png";
@@ -86,6 +86,7 @@ void Aircraft::setAltitude( float altitude ) {
 }
 
 void Aircraft::startEngine() {
+	// Включённый режим GUI позволяет управлять аппаратом, а выключенный режим нет
 	if (is_gui) {
 		cv::namedWindow( "Trackbars", cv::WINDOW_NORMAL );
 		cv::createTrackbar( "X Velocity (m/s)", "Trackbars", &control_panel.x_velocity, x_velocity );
@@ -115,12 +116,22 @@ void Aircraft::startEngine() {
 		}
 	}
 	else {
-		control_panel.x_velocity += 100;
-		control_panel.y_velocity += 1000;
+		setPosition( -40600, 40600);
 
-		std::cout << "getHeight call time: " << std::chrono::duration<double, std::milli>(call_time).count() << " ms" << std::endl;
-		std::cout << "interval time between getHeight calls: " << std::chrono::duration<double, std::milli>( interval_time ).count() << " ms" << std::endl;
-		std::cout << std::endl;
+		control_panel.x_velocity += 900;
+		control_panel.y_velocity -= 900;
+		while (true) {
+			std::cout << std::endl << std::endl;
+
+			std::cout << "Latitude: " << latitude << std::endl;
+			std::cout << "Longitude: " << longitude << std::endl;
+			std::cout << "Surface height: " << surface_height << " m" << std::endl;
+			std::cout << "Distance to surface: " << distance_to_surface << " m" << std::endl;
+			std::cout << "'getHeight()' call time: " << std::chrono::duration<double, std::milli>( call_time ).count() << " ms" << std::endl;
+			std::cout << "Interval time between 'getHeight()' calls: " << std::chrono::duration<double, std::milli>( interval_time ).count() << " ms" << std::endl;
+
+			std::this_thread::sleep_for( delay_ms );
+		}
 	}
 }
 
