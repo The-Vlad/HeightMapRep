@@ -15,7 +15,7 @@ class Aircraft
 	float surface_height = NULL;
 
 	//int delay_int = 1;				// delay in milliseconds
-	std::chrono::milliseconds delay_ms = std::chrono::milliseconds( 1500 );
+	std::chrono::milliseconds delay_ms = std::chrono::milliseconds( 1 );
 	std::chrono::steady_clock::duration call_time, interval_time;
 
 	// Панель управления нужна для cv::Trackbar, так как он принимает тип int, а не float

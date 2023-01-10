@@ -130,7 +130,7 @@ void Aircraft::startEngine() {
 			std::cout << "'getHeight()' call time: " << std::chrono::duration<double, std::milli>( call_time ).count() << " ms" << std::endl;
 			std::cout << "Interval time between 'getHeight()' calls: " << std::chrono::duration<double, std::milli>( interval_time ).count() << " ms" << std::endl;
 
-			std::this_thread::sleep_for( delay_ms );
+			std::this_thread::sleep_for( delay_ms*1500 );
 		}
 	}
 }
