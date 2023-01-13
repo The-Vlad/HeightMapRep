@@ -31,7 +31,7 @@ int main() {
 	map.showMap();*/
 
 
-	Aircraft aircraft( "Il-86", 0.f, 0.f, 12000);
+	
 	/*aircraft.startEngine();
 	aircraft.fly();
 	aircraft.getInfo();*/
@@ -39,6 +39,7 @@ int main() {
 	//std::thread fly_thr( &Aircraft::fly, aircraft);			//fly thread
 	//std::thread info_thr( &Aircraft::getInfo, aircraft);	//info thread
 
+	Aircraft aircraft( "Il-86", 0.f, 0.f, 12000 );
 	std::thread gui_thr( [&]() {aircraft.startEngine(); } );	//gui thread
 	std::thread fly_thr( [&]() {aircraft.fly(); } );			//fly thread
 	std::thread info_thr( [&]() {aircraft.getInfo(); } );	//info thread

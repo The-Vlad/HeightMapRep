@@ -28,6 +28,7 @@ class Aircraft
 	std::string heightmap_path;
 	HeightMap* hmap;
 	std::mutex aircraft_mtx;
+
 public:
 	Aircraft(std::string name, float latitude=0.f, float longitude=0.f, float altitude=1000.f,
 		float x_velocity=0.f, float y_velocity=0.f);

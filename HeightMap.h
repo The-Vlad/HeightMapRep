@@ -20,6 +20,7 @@ class HeightMap
 	std::string window_name = "Current Map";
 	cv::Mat current_map;
 	std::mutex mtx;
+
 public:
 	HeightMap(
 		std::string filename, bool is_new_map=true,

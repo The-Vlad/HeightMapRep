@@ -10,6 +10,7 @@ Aircraft::Aircraft( std::string name, float latitude, float longitude, float alt
 	y_velocity( y_velocity )
 {
 	char answer;
+
 	while (true) {
 		std::cout << "Укажите путь до файла. Загрузить файл \"Resources/8k_map/Heightmap.png\"? (y/n): ";
 		std::cin >> answer;

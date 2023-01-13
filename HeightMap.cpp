@@ -18,6 +18,7 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 	// инициализация количества кусочков по осям и остатков
 	int x_pieces_num = 1, y_pieces_num = 1;
 	int piece_x_res = 0, piece_y_res = 0;
+
 	// получение количества пикселей по осям
 	int cols = current_map.cols, rows = current_map.rows;
 	bool crop = false;
