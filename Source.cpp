@@ -1,4 +1,4 @@
-#include "Aircraft.h"
+﻿#include "Aircraft.h"
 #include <thread>
 
 void f();

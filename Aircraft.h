@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "HeightMap.h"
 #include <chrono>	// for update time and calculating stats of vehicle
 
@@ -18,7 +18,7 @@ class Aircraft
 	std::chrono::milliseconds delay_ms = std::chrono::milliseconds( 1 );
 	std::chrono::steady_clock::duration call_time, interval_time;
 
-	// Панель управления нужна для cv::Trackbar, так как он принимает тип int, а не float
+	// РџР°РЅРµР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ РЅСѓР¶РЅР° РґР»СЏ cv::Trackbar, С‚Р°Рє РєР°Рє РѕРЅ РїСЂРёРЅРёРјР°РµС‚ С‚РёРї int, Р° РЅРµ float
 	struct ControlPanel {
 		int x_velocity;
 		int y_velocity;

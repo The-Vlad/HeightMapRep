@@ -1,4 +1,4 @@
-#include "Aircraft.h"
+п»ї#include "Aircraft.h"
 
 Aircraft::Aircraft( std::string name, float latitude, float longitude, float altitude,
 	float x_velocity, float y_velocity )
@@ -12,26 +12,26 @@ Aircraft::Aircraft( std::string name, float latitude, float longitude, float alt
 	char answer;
 
 	while (true) {
-		std::cout << "Укажите путь до файла. Загрузить файл \"Resources/8k_map/Heightmap.png\"? (y/n): ";
+		std::cout << "РЈРєР°Р¶РёС‚Рµ РїСѓС‚СЊ РґРѕ С„Р°Р№Р»Р°. Р—Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» \"Resources/8k_map/Heightmap.png\"? (y/n): ";
 		std::cin >> answer;
 		if (answer == 'y') {
 			heightmap_path = "Resources/8k_map/Heightmap.png";
 			break;
 		}
 		else if (answer == 'n') {
-			std::cout << "Введите путь до файла: ";
+			std::cout << "Р’РІРµРґРёС‚Рµ РїСѓС‚СЊ РґРѕ С„Р°Р№Р»Р°: ";
 			std::cin.ignore( std::numeric_limits<std::streamsize>::max(), '\n' );
 			std::getline( std::cin, heightmap_path );
 			break;
 		}
 		else {
-			std::cout << "Ошибка ввода.\n";
+			std::cout << "РћС€РёР±РєР° РІРІРѕРґР°.\n";
 		}
 	}
 
 	bool is_new;
 	while (true) {
-		std::cout << "Разбить изображение на фрагменты если это не сделано? (y/n): ";
+		std::cout << "Р Р°Р·Р±РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ РЅР° С„СЂР°РіРјРµРЅС‚С‹ РµСЃР»Рё СЌС‚Рѕ РЅРµ СЃРґРµР»Р°РЅРѕ? (y/n): ";
 		std::cin >> answer;
 		if (answer == 'y') {
 			is_new = true;
@@ -42,12 +42,12 @@ Aircraft::Aircraft( std::string name, float latitude, float longitude, float alt
 			break;
 		}
 		else {
-			std::cout << "Ошибка ввода.\n";
+			std::cout << "РћС€РёР±РєР° РІРІРѕРґР°.\n";
 		}
 	}
 
 	while (true) {
-		std::cout << "Включить GUI? (y/n): ";
+		std::cout << "Р’РєР»СЋС‡РёС‚СЊ GUI? (y/n): ";
 		std::cin >> answer;
 		if (answer == 'y') {
 			is_gui = true;
@@ -58,11 +58,11 @@ Aircraft::Aircraft( std::string name, float latitude, float longitude, float alt
 			break;
 		}
 		else {
-			std::cout << "Ошибка ввода.\n";
+			std::cout << "РћС€РёР±РєР° РІРІРѕРґР°.\n";
 		}
 	}
 	
-	// Создание карты высот и установка начальной позиции
+	// РЎРѕР·РґР°РЅРёРµ РєР°СЂС‚С‹ РІС‹СЃРѕС‚ Рё СѓСЃС‚Р°РЅРѕРІРєР° РЅР°С‡Р°Р»СЊРЅРѕР№ РїРѕР·РёС†РёРё
 	hmap = new HeightMap( heightmap_path, is_new, -40645, 40645 );
 	hmap->SetUAVPos( latitude, longitude );
 
@@ -87,7 +87,7 @@ void Aircraft::setAltitude( float altitude ) {
 }
 
 void Aircraft::startEngine() {
-	// Включённый режим GUI позволяет управлять аппаратом, а выключенный режим нет
+	// Р’РєР»СЋС‡С‘РЅРЅС‹Р№ СЂРµР¶РёРј GUI РїРѕР·РІРѕР»СЏРµС‚ СѓРїСЂР°РІР»СЏС‚СЊ Р°РїРїР°СЂР°С‚РѕРј, Р° РІС‹РєР»СЋС‡РµРЅРЅС‹Р№ СЂРµР¶РёРј РЅРµС‚
 	if (is_gui) {
 		cv::namedWindow( "Trackbars", cv::WINDOW_NORMAL );
 		cv::createTrackbar( "X Velocity (m/s)", "Trackbars", &control_panel.x_velocity, x_velocity );
@@ -176,8 +176,8 @@ void Aircraft::getInfo() {
 	
 
 	while (true) {
-		// sleep_for слишком медленная функция для вызова getHeight из-за необходимости распределения
-		// ресурсов и составления расписания при работе программы в режиме нескольких потоков
+		// sleep_for СЃР»РёС€РєРѕРј РјРµРґР»РµРЅРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РІС‹Р·РѕРІР° getHeight РёР·-Р·Р° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё СЂР°СЃРїСЂРµРґРµР»РµРЅРёСЏ
+		// СЂРµСЃСѓСЂСЃРѕРІ Рё СЃРѕСЃС‚Р°РІР»РµРЅРёСЏ СЂР°СЃРїРёСЃР°РЅРёСЏ РїСЂРё СЂР°Р±РѕС‚Рµ РїСЂРѕРіСЂР°РјРјС‹ РІ СЂРµР¶РёРјРµ РЅРµСЃРєРѕР»СЊРєРёС… РїРѕС‚РѕРєРѕРІ
 		//std::this_thread::sleep_for( delay_ms );
 		//aircraft_mtx.lock();
 		t1 = std::chrono::steady_clock::now();

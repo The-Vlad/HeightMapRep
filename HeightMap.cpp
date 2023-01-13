@@ -1,4 +1,4 @@
-#include "HeightMap.h"
+п»ї#include "HeightMap.h"
 
 HeightMap::HeightMap( std::string filename, bool is_new_map,
 	float zero_latitude, float zero_longitude,
@@ -15,11 +15,11 @@ HeightMap::HeightMap( std::string filename, bool is_new_map,
 	current_map = cv::imread( filename );
 	cv::cvtColor( current_map, current_map, cv::COLOR_BGR2GRAY );
 
-	// инициализация количества кусочков по осям и остатков
+	// РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєРѕР»РёС‡РµСЃС‚РІР° РєСѓСЃРѕС‡РєРѕРІ РїРѕ РѕСЃСЏРј Рё РѕСЃС‚Р°С‚РєРѕРІ
 	int x_pieces_num = 1, y_pieces_num = 1;
 	int piece_x_res = 0, piece_y_res = 0;
 
-	// получение количества пикселей по осям
+	// РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РїРёРєСЃРµР»РµР№ РїРѕ РѕСЃСЏРј
 	int cols = current_map.cols, rows = current_map.rows;
 	bool crop = false;
 
@@ -94,7 +94,7 @@ float HeightMap::getHeight( float latitude, float longitude ) {
 }
 
 void HeightMap::cropImage( int x_pieces_num, int y_pieces_num, int piece_x_res, int piece_y_res ) {
-	// Создаём буферные прямоугольники для обрезки изображений
+	// РЎРѕР·РґР°С‘Рј Р±СѓС„РµСЂРЅС‹Рµ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРё РґР»СЏ РѕР±СЂРµР·РєРё РёР·РѕР±СЂР°Р¶РµРЅРёР№
 	cv::Rect rect( 0, 0, piece_size, piece_size );
 	cv::Rect residual_rect_right_corner( x_pieces_num * piece_size, 0, piece_size + piece_x_res, piece_size );
 	cv::Rect residual_rect_bottom_corner( 0, y_pieces_num * piece_size, piece_size, piece_size + piece_y_res );
